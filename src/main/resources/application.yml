@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: Andrea
+  profiles:
+    active: dev

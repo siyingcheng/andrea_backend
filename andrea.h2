@@ -1,0 +1,4 @@
+# Placeholder file for H2 database
+# The real H2 database storage (MVStore) will be created automatically when the application starts.
+# Expect actual DB files like `andrea.h2.mv.db` to appear in the project root after running the app.
+
