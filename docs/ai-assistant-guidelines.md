@@ -4,7 +4,7 @@
 Provide explicit, consistent rules the assistant must follow when asked to generate, modify, or review code in this repository.
 
 ## Project context
-- Languages: Java (OpenJDK 21)
+- Languages: Java (OpenJDK 25)
 - Build: Maven
 - Code style: Google Java Style Guide
 - Testing: TestNG
