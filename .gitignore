@@ -34,5 +34,5 @@ build/
 
 *.mv.db
 *.lock.db
-#*.trace.db
+*.trace.db
 *.h2.db
