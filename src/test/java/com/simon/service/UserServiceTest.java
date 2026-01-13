@@ -7,6 +7,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -31,12 +33,13 @@ public class UserServiceTest {
     private UserService userService;
 
     private AutoCloseable mocks;
+    private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
     @BeforeMethod
     public void setUp() {
         mocks = MockitoAnnotations.openMocks(this);
         // instantiate service with mocked repository so mocks are used
-        userService = new UserService(userRepository);
+        userService = new UserService(userRepository, passwordEncoder);
         // Ensure the service uses a matching password encoder; UserService creates its own encoder
     }
 
@@ -64,7 +67,7 @@ public class UserServiceTest {
         assertEquals(u.getUsername(), "alice");
         assertEquals(u.getEmail(), "alice@example.com");
         assertNotNull(u.getPasswordHash());
-        assertTrue(new BCryptPasswordEncoder(12).matches("password123", u.getPasswordHash()));
+        assertTrue(passwordEncoder.matches("password123", u.getPasswordHash()));
         assertNotNull(u.getCreatedAt());
         assertNotNull(u.getUpdatedAt());
         assertTrue(u.getIsActive());
@@ -100,9 +103,8 @@ public class UserServiceTest {
             groups = {"unit", "service"},
             priority = 4)
     public void checkPassword_withCorrectAndIncorrectPasswords() {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
         User u = new User();
-        u.setPasswordHash(encoder.encode("mypw"));
+        u.setPasswordHash(passwordEncoder.encode("mypw"));
 
         assertTrue(userService.checkPassword(u, "mypw"));
         assertFalse(userService.checkPassword(u, "wrong"));
@@ -117,7 +119,7 @@ public class UserServiceTest {
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         User updated = userService.updatePassword(u, "newpass");
-        assertTrue(new BCryptPasswordEncoder(12).matches("newpass", updated.getPasswordHash()));
+        assertTrue(passwordEncoder.matches("newpass", updated.getPasswordHash()));
         assertNotNull(updated.getUpdatedAt());
     }
 }
